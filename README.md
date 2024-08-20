@@ -1,4 +1,4 @@
-### Apollo决策的潜在问题
+## 1. Apollo决策的潜在问题
 （1）无主动变道能力，变道需要存在多条参考线，且主车的前方和后方一定距离内不能有障碍物，旁边车道在一定距离内也不能有障碍物。借道条件苛刻：仅单条参考线、规划起始速度小于借道速度、阻挡障碍物离地图中overlap 足够远、为长时间阻挡障碍物、障碍物在规划终点范围内和非可侧面通过障碍物这6个条件才能借道，难以触发过于保守
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_5.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724131335210-e0316db0-2298-4406-9a0e-637f414c03d5.jpeg#averageHue=%23f8f6f3&clientId=u2ceaa73c-0963-4&from=ui&id=c0iWS&originHeight=331&originWidth=933&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=23056&status=done&style=none&taskId=ub9fa283a-3346-43d2-8d8c-aeeacbcd521&title=)
@@ -21,14 +21,19 @@
 解决方案：构建多场景（multi-scenario）来处理各种不同情况
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_4.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724130631804-7c34b79a-98a3-4b6f-ab22-754eaa25f603.jpeg#averageHue=%238a8c7e&clientId=u2ceaa73c-0963-4&from=ui&height=567&id=u23cf575e&originHeight=987&originWidth=1204&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=101836&status=done&style=none&taskId=u6cd44603-225b-48aa-888b-84d6b8af24e&title=&width=691.178955078125)
-### 多决策交互博弈
-#### 整体介绍
+
+## 2. 多决策交互博弈
+
+### 2.1 整体介绍
+
 为解决 1）Apollo解空间过小行为过于保守； 2）对多模态的信息使用不充分；
-##### 整体流程
+### 2.2 整体流程
+
 定义特定的自车策略，在每种自车策略下模拟自车和他车的交互博弈过程，通过闭环前推轨迹（forward_simulation ）计算联合状态，得到一个个场景，通过比较ego状态，把这些场景组合成场景树（ego-policy-conditioned scene-tree）。然后通过防御性规划（contingency-planning）基于场景树构建优化自车轨迹。 
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_7.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724132976895-74d92d55-0b93-48a2-ae4a-d7fb659d8df0.jpeg#averageHue=%23f6f8f2&clientId=u2ceaa73c-0963-4&from=ui&id=uf10c4949&originHeight=503&originWidth=1304&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=58644&status=done&style=none&taskId=u3b6f4f51-8050-4fe0-be66-0b7da1a338b&title=)
-##### 流程伪代码
+
+### 2.3 流程伪代码
 ```cpp
 // 参数初始化
 [horizon, max_branch_time, divergence_threshold] = Init()
@@ -55,7 +60,7 @@ end
 
 [policy, traj] = PolicySelection();
 ```
-##### 开发内容和功能定义
+### 2.4 开发内容和功能定义
 
 - 构建场景树
 
@@ -64,9 +69,11 @@ end
 - contigency planning
 
 基于场景树，通过contigency planning生成自车轨迹树。
-#### 功能实现
-task实现在变道决策（LaneChangeDecider）之前，参考线生成之后，输出一条最优的先验轨迹给到下游横纵向规划作为参考
-##### 输入输出
+
+### 2.5 功能实现
+任务实现在变道决策（LaneChangeDecider）之前，参考线生成之后，输出一条最优的先验轨迹给到下游横纵向规划作为参考
+
+#### 2.5.1 输入输出
 输入：
 
 - ReferenceLineInfo，参考线信息
@@ -78,7 +85,8 @@ task实现在变道决策（LaneChangeDecider）之前，参考线生成之后�
 - Optimal trajectory，Optimal policy
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_7.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724133625504-839165ff-57f4-4dc7-a48b-39ec4ead304a.jpeg#averageHue=%23fcfdf9&clientId=u2ceaa73c-0963-4&from=ui&id=u6ceeb508&originHeight=511&originWidth=1321&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=66423&status=done&style=none&taskId=ud73b6378-9c02-4d1e-b8c8-baba21463ca&title=)
-##### 场景树的构建
+
+#### 2.5.2 场景树的构建
 场景树的构建包括以下三个步骤：
 
 a. 自车策略的构建, 定义横向动作与纵向动作, 并对动作空间进行组合得到多种自车策略。整个 Planning Horizon采用一个策略，类似于MPDM，通过planning cycle进行自车策略的更新。横向动作空间包括了{Lane change left、Lane change right、lane keeping}纵向动作空间包括了{Accelerate、Maintain、Decelerate}
@@ -90,7 +98,8 @@ b. 筛选关键交互车辆, 对自车轨迹按照语义动作采样得到一条
 ![01916e2c-de59-7c99-a374-c741434bbfae_13.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724137589460-e6308091-82cb-416f-ba82-3c749a27d0f5.jpeg#averageHue=%23ecede6&clientId=u2ceaa73c-0963-4&from=ui&id=uf7faeaad&originHeight=494&originWidth=924&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=55174&status=done&style=none&taskId=u123cfa4a-ef3f-4116-a723-b66e1c6d89f&title=)
 
 c. 基于关键车辆的不同预测轨迹，分别进行前向模拟，得到不同的自车轨迹，对于每1s的不同场景自车轨迹进行评估，并根据自车的位置、速度和朝向来构建场景树，对一定阈值范围内的场景视为相似场景, 共享节点, 否则分支并最终构成场景树
-###### 获取语义级别的自车策略GetEgoPolicySet()
+
+##### 2.5.2.1 获取语义级别的自车策略GetEgoPolicySet()
 > 作用: 获取自车Planning Horizon的可行策略, 打开横纵向解空间
 > 输入：Ego的横向动作集合和纵向动作集合
 > 输出：Ego的候选动作（组合横纵向动作）的集合
@@ -110,7 +119,7 @@ def GetEgoPolicySet(lat_behavior: List[str], lon_behavior: List[str]) -> List[Li
             candidate_policy.append([lat_action, lon_action])
     return candidate_policy
 ```
-###### 初筛候选车辆 GetCandidateAgents()
+##### 2.5.2.2 初筛候选车辆 GetCandidateAgents()
 > 作用：根据自车当前的状态，获取与自车交互的候选车辆
 > 
 > 输入：自车的初始状态
@@ -136,9 +145,11 @@ def GetIntentionAgents(obstacles):
             if (candidate_interaction_agent[agent.id()].trajectory_size > 1):
                 candidate_key_agent[agent.id()] = agent
 ```
-###### 获取关键车辆 GetKeyAgents()
+##### 2.5.2.3 获取关键车辆 GetKeyAgents()
 > 作用：基于开环仿真筛选与自车交互的关键车辆
+> 
 > 输入：candidate_key_agent
+> 
 > 输出：final_key_agent
 
 伪代码：
@@ -168,7 +179,7 @@ def GetKeyAgents(candidate_key_agent, ego_policy):
                 break
 
 ```
-###### 他车意图的获取 GetOtherAgentIntention()
+##### 2.5.2.4 他车意图的获取 GetOtherAgentIntention()
 > 作用：基于预测轨迹获取他车的初始意图
 > 
 > 输入：障碍物的预测轨迹、自车位置和自车策略
@@ -198,9 +209,11 @@ def GetOtherAgentIntention(candidate_interact_agent):
                 key_agent_intention[agent.id()] = key_agent_prob_intention
 
 ```
-###### 关键场景组合 GetIntentionCombination()
+##### 2.5.2.5 关键场景组合 GetIntentionCombination()
 > 作用：基于自车策略和不同关键智能体的意图组合成不同意图组合的场景
+> 
 > 输入：交互车辆和关键车辆的意图，自车的策略
+> 
 > 输出：关键场景意图组合
 
 伪代码：
@@ -233,7 +246,7 @@ def combine_intentions(obstacles, combination=[]):
     return all_combination
 
 ```
-###### 场景前向外推 ForwardSimulation()
+##### 2.5.2.6 场景前向外推 ForwardSimulation()
 > 作用：对每个场景（意图组合）进行闭环外推，不需要太精细的轨迹(epsilon中是0.2s的步长)，主要是确认大致的交互关系。参考epsilon选择context-aware的纯跟踪+IDM进行。
 > 
 > 输入：自车车辆信息(包含车辆物理信息, 位姿状态信息, 自车意图, 车道信息以及一些标签)，交互车辆信息(包含车辆物理信息，位姿状态信息，横向意图or车辆预测轨迹，车道信息以及一些标签)
@@ -332,7 +345,7 @@ ForwardSimulation(std::vector<double> dt_steps, ForwardSimEgoState forward_sim_e
 }
 // EgoForwardSimulation和AgentForwardSimulation的具体实现参考Epsilon
 ```
-###### 场景树的构建 SceneTreeConstruction()
+##### 2.5.2.7 场景树的构建 SceneTreeConstruction()
 > 针对每一个ego-policy构建一个场景树，这一步主要是计算场景的分歧点。
 
 计算Branch point:
@@ -387,7 +400,7 @@ def SetNewState(pos, vel, acc, jerk):
     ego_state.jerk = jerk
 
 ```
-##### contigency planning
+#### 2.5.3 contigency planning
 输入：
 
 - VehicleState: 自车的状态
@@ -426,7 +439,7 @@ optimal_trajectory = GetOptimalTrajectory(optimal_traj_tree)
 output: optimal_trajectory
 
 ```
-###### 获取轨迹树集合：GetTrajectoryTreeSet()
+##### 2.5.3.1 获取轨迹树集合：GetTrajectoryTreeSet()
 > 作用：获取自车各个不同policy下的轨迹树
 > 
 > 输入：各个不同policy下的场景树（包含自车意图、agent意图及对应的agent的预测轨迹， 自车轨迹的粗解)
@@ -443,7 +456,7 @@ for scene_tree_set do
     F_traj_set <-- F_traj
 end
 ```
-###### 获取轨迹树：GetTrajectoryTree()
+##### 2.5.3.2 获取轨迹树：GetTrajectoryTree()
 > 作用：根据单棵场景树、障碍物预测轨迹、初始状态生成该意图下的轨迹树
 > 
 > 输入：某policy下的场景树、障碍物预测轨迹、初始状态
@@ -489,7 +502,7 @@ void GetTrajectoryTree(scene_tree, obstacle, vehicle_state)
 }
 
 ```
-###### 获取最优轨迹：GetOptimalTrajectory()
+##### 2.5.3.3 获取最优轨迹：GetOptimalTrajectory()
 > 作用：根据优化后的结果对自车意图下对应的轨迹树进行打分，得到最优策略对应的输出轨迹
 > 输入：scene_tree_set、traj_tree_set
 > 输出：optimal traj
@@ -514,9 +527,11 @@ GetOptimalTrajectory(scene_tree_set)
     optimal_traj = ChooseOptimalTrajectory(min_policy_id);
 }
 ```
-###### 自车策略打分：PolicySetScore()
+##### 2.5.3.4 自车策略打分：PolicySetScore()
 > 作用: 根据每个策略下轨迹树的情况, 进行综合打分
+> 
 > 输入：scene_tree
+> 
 > 输出：scene_tree的得分
 
 伪代码：
@@ -535,7 +550,7 @@ cost_fu = CalUncertaintyCost(traj_tree);
 cost_sum = w_1 * cost_fs + w_2 * cost_fe + w_3 * cost_fn + w_4 * cost_fu;
 
 ```
-###### 选取最优轨迹：ChooseOptimalTrajectory()
+##### 2.5.3.5 选取最优轨迹：ChooseOptimalTrajectory()
 > 作用：根据输入的policyset中的打分情况选择最优的轨迹树，再根据最优的轨迹树输出最优轨迹
 > 
 > 输入：scene_tree_set、 traj_tree_set(scene_tree和traj_tree在同一个数据类型中实现)
@@ -560,7 +575,7 @@ optimal_traj = GetTraj(optimal_traj_tree) {
 
 ```
 
-#### 路测效果
+## 3. 路测效果
 
 | 小gap变道 | [1.mp4 (15.02MB)](./case/1.mp4) [2.mp4 (12.81MB)](./case/2.mp4) [3.mp4 (15.4MB)](./case/3.mp4) |
 | :-- | --- |
