@@ -540,9 +540,6 @@ optimal_traj = GetTraj(optimal_traj_tree) {
 }
 
 ```
-#### 路测效果
-
-#### 路测效果
 
 #### 路测效果
 
@@ -554,6 +551,3 @@ optimal_traj = GetTraj(optimal_traj_tree) {
 | 绕行后变道，成功避开死车 | [![7.mp4 (23.03MB)](./case/7.mp4)](./case/7.mp4) |
 | 低速行驶多次变道，和前方车辆行为保持一致 | [![8.mp4 (84.47MB)](./case/8.mp4)](./case/8.mp4)[![9.mp4 (67.89MB)](./case/9.mp4)](./case/9.mp4) |
 | 路口前效率变道 | [![10.mp4 (15.39MB)](./case/10.mp4)](./case/10.mp4) |
-
-
-
