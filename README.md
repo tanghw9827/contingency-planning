@@ -80,12 +80,15 @@ task实现在变道决策（LaneChangeDecider）之前，参考线生成之后�
 ![01916e2c-de59-7c99-a374-c741434bbfae_7.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724133625504-839165ff-57f4-4dc7-a48b-39ec4ead304a.jpeg#averageHue=%23fcfdf9&clientId=u2ceaa73c-0963-4&from=ui&id=u6ceeb508&originHeight=511&originWidth=1321&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=66423&status=done&style=none&taskId=ud73b6378-9c02-4d1e-b8c8-baba21463ca&title=)
 ##### 场景树的构建
 场景树的构建包括以下三个步骤：
+
 a. 自车策略的构建, 定义横向动作与纵向动作, 并对动作空间进行组合得到多种自车策略。整个 Planning Horizon采用一个策略，类似于MPDM，通过planning cycle进行自车策略的更新。横向动作空间包括了{Lane change left、Lane change right、lane keeping}纵向动作空间包括了{Accelerate、Maintain、Decelerate}
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_13.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724137535732-ddc69647-538f-43d5-b688-c8129bcf4723.jpeg#averageHue=%23f9f9f5&clientId=u2ceaa73c-0963-4&from=ui&id=ufbb78ed6&originHeight=608&originWidth=606&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=27105&status=done&style=none&taskId=u991c4322-89c7-4c24-b749-dc228f10cf8&title=)
+
 b. 筛选关键交互车辆, 对自车轨迹按照语义动作采样得到一条粗略轨迹作为开环仿真的, 将他车OpenloopSimForward的预测轨迹作为开环仿真的结果，找出可能存在危险的车辆作为关键车辆。对于路口场景，仅考虑对向方向第一辆车。
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_13.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724137589460-e6308091-82cb-416f-ba82-3c749a27d0f5.jpeg#averageHue=%23ecede6&clientId=u2ceaa73c-0963-4&from=ui&id=uf7faeaad&originHeight=494&originWidth=924&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=55174&status=done&style=none&taskId=u123cfa4a-ef3f-4116-a723-b66e1c6d89f&title=)
+
 c. 基于关键车辆的不同预测轨迹，分别进行前向模拟，得到不同的自车轨迹，对于每1s的不同场景自车轨迹进行评估，并根据自车的位置、速度和朝向来构建场景树，对一定阈值范围内的场景视为相似场景, 共享节点, 否则分支并最终构成场景树
 ###### 获取语义级别的自车策略GetEgoPolicySet()
 > 作用: 获取自车Planning Horizon的可行策略, 打开横纵向解空间
@@ -109,7 +112,9 @@ def GetEgoPolicySet(lat_behavior: List[str], lon_behavior: List[str]) -> List[Li
 ```
 ###### 初筛候选车辆 GetCandidateAgents()
 > 作用：根据自车当前的状态，获取与自车交互的候选车辆
+> 
 > 输入：自车的初始状态
+> 
 > 输出：候选的交互车辆
 
 伪代码：建立一个基于自车位置的动态筛选框，考虑横向距离为15m内，纵向前瞻距离为巡航速度与交互时间乘积与planning horizon的最小值，后方考虑距离为30m的空间对该框架内的障碍物加入候选交互车辆，同时对于该范围内预测轨迹大于1条的车辆，加入候选关键车辆。
@@ -165,7 +170,9 @@ def GetKeyAgents(candidate_key_agent, ego_policy):
 ```
 ###### 他车意图的获取 GetOtherAgentIntention()
 > 作用：基于预测轨迹获取他车的初始意图
+> 
 > 输入：障碍物的预测轨迹、自车位置和自车策略
+> 
 > 输出：其他智能体的意图（非关键车辆最大概率意图，关键车辆多意图）
 
 伪代码：获取他车的意图为了后续根据不同的意图组成不同的关键场景, 根据前面筛选的交互车辆和关键车辆，关键车辆考虑多个意图对自车带来的影响。基于预测给出的障碍物轨迹，基于规则判断障碍物的初始意图，并基于MOBIL模型实时更新障碍物的意图
@@ -228,11 +235,14 @@ def combine_intentions(obstacles, combination=[]):
 ```
 ###### 场景前向外推 ForwardSimulation()
 > 作用：对每个场景（意图组合）进行闭环外推，不需要太精细的轨迹(epsilon中是0.2s的步长)，主要是确认大致的交互关系。参考epsilon选择context-aware的纯跟踪+IDM进行。
+> 
 > 输入：自车车辆信息(包含车辆物理信息, 位姿状态信息, 自车意图, 车道信息以及一些标签)，交互车辆信息(包含车辆物理信息，位姿状态信息，横向意图or车辆预测轨迹，车道信息以及一些标签)
+> 
 > 输出：未来一段时间的联合状态
 
 ![01916e2c-de59-7c99-a374-c741434bbfae_19.jpg](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724138794273-89a9e734-7370-4d58-ac0e-3b09c91724cb.jpeg#averageHue=%23eaeee6&clientId=u2ceaa73c-0963-4&from=ui&id=ud803577d&originHeight=402&originWidth=1049&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=41624&status=done&style=none&taskId=u655151ac-83d8-4ab1-8c4e-75e32bfb0b0&title=)
 伪代码：
+
 数据类型定义：
 ```cpp
 class ForwardSimEgoState {
@@ -270,7 +280,8 @@ class ForwardSimAgentState {
 };
 
 ```
-流程：关键目标：使用自车和他车当前时刻的状态以及意图进行考虑交互的闭环前推
+流程：使用自车和他车当前时刻的状态以及意图进行考虑交互的闭环前推
+
 闭环外推横向外推方式：context-aware pure-pursuit (参考epsilon)
 
 - 变道情况下没车时的跟踪路径为相邻车道的中心线，有车时的跟踪路径为考虑安全情况下的偏移路径, 类似于Apollo当前变道不clear时的观察区域。
@@ -327,13 +338,15 @@ ForwardSimulation(std::vector<double> dt_steps, ForwardSimEgoState forward_sim_e
 计算Branch point:
 如果使用固定的时间点进行分叉，分支数量会随着场景组合的数量指数增长
 
-- 这里计算参考MARC: Multipolicy and Risk-aware Contingency Planning for Autonomous Driving
+> 这里计算参考MARC: Multipolicy and Risk-aware Contingency Planning for Autonomous Driving
 
-由于自车轨迹是与场景上下文交互的累积结果，因此它们的差异可以用来揭示场景的分歧。 ego轨迹差异大于一定阈值的时间点作为分叉点
+由于自车轨迹是与场景上下文交互的累积结果，因此它们的差异可以用来揭示场景的分歧。 ego轨迹差异大于一定阈值的时间点作为分叉点。
 
 ![Fig 1](./picture/1.png)
 
-(a) scene divergence       (b) trajectory tree                                        (c) risk-neutral vs risk-averse
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(a) scene divergence &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (b) trajectory tree &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (c) risk-neutral vs risk-averse
+
+
 
 场景树分叉的判断标准: 
 由于场景外推以0.2s外推一个状态，可以选择每5个节点，即1s进行一次场景树的合并判断, 找到分叉点,最晚分叉点设置为4s。
@@ -415,7 +428,9 @@ output: optimal_trajectory
 ```
 ###### 获取轨迹树集合：GetTrajectoryTreeSet()
 > 作用：获取自车各个不同policy下的轨迹树
+> 
 > 输入：各个不同policy下的场景树（包含自车意图、agent意图及对应的agent的预测轨迹， 自车轨迹的粗解)
+> 
 > 输出：自车不同policy下的轨迹树集合
 
 伪代码：针对集合中的每一段场景树中的轨迹初解调用ilqr求解器生成轨迹树集合
@@ -430,7 +445,9 @@ end
 ```
 ###### 获取轨迹树：GetTrajectoryTree()
 > 作用：根据单棵场景树、障碍物预测轨迹、初始状态生成该意图下的轨迹树
+> 
 > 输入：某policy下的场景树、障碍物预测轨迹、初始状态
+> 
 > 输出：某policy下的轨迹树
 
 伪代码：根据场景树每一段branch中的粗解进行优化，保证分叉点的状态连续，最终生成轨迹树
