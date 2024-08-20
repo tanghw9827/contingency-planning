@@ -331,7 +331,7 @@ ForwardSimulation(std::vector<double> dt_steps, ForwardSimEgoState forward_sim_e
 
 由于自车轨迹是与场景上下文交互的累积结果，因此它们的差异可以用来揭示场景的分歧。 ego轨迹差异大于一定阈值的时间点作为分叉点
 
-![image.png](https://cdn.nlark.com/yuque/0/2024/png/27299753/1724139481015-ff3e3923-61a4-4602-85ac-deb0099fa795.png#averageHue=%23f7f5ee&clientId=u2ceaa73c-0963-4&from=paste&height=316&id=uc7392b0c&originHeight=348&originWidth=853&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=108927&status=done&style=none&taskId=ud36892a3-52db-4aea-99df-a0733e98b7e&title=&width=775.4545286470212)
+<img src="https://cdn.nlark.com/yuque/0/2024/png/27299753/1724139481015-ff3e3923-61a4-4602-85ac-deb0099fa795.png#averageHue=%23f7f5ee&clientId=u2ceaa73c-0963-4&from=paste&height=316&id=uc7392b0c&originHeight=348&originWidth=853&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&size=108927&status=done&style=none&taskId=ud36892a3-52db-4aea-99df-a0733e98b7e&title=&width=775.4545286470212" width="800px">
 
 (a) scene divergence       (b) trajectory tree                                        (c) risk-neutral vs risk-averse
 
