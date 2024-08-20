@@ -47,7 +47,7 @@
 
 ### 2.1 整体介绍
 
-为解决 1）Apollo解空间过小行为过于保守； 2）对多模态的信息使用不充分；提出使用多决策交互博弈来构建场景树，结合contingency planning，构建出更优的路径。
+为解决 1）Apollo解空间过小行为过于保守； 2）对多模态的信息使用不充分；使用多决策交互博弈来构建场景树，结合contingency planning，构建出更优的路径。
 ### 2.2 整体流程
 
 定义特定的自车策略，在每种自车策略下模拟自车和他车的交互博弈过程，通过闭环前推轨迹（forward_simulation ）计算联合状态，得到一个个场景，通过比较ego状态，把这些场景组合成场景树（ego-policy-conditioned scene-tree）。然后通过防御性规划（contingency-planning）基于场景树构建优化自车轨迹。 
@@ -129,7 +129,9 @@ c. 基于关键车辆的不同预测轨迹，分别进行前向模拟，得到�
 
 伪代码:
 自车的横向动作集合：{Lane change left、Lane change right、lane keeping}
+
 自车的纵向动作集合：{Accelerate、Maintain、Decelerate}
+
 动作组合出自车的横纵向行为共有9种
 ```cpp
 lat_behavior = ["LCL", "LCR", "LK"]
@@ -181,9 +183,13 @@ EPSILON: An Efficient Planning System for Automated Vehicles in Highly Interacti
 在不考虑交互的前提下开环仿真来找到可能会与自车发生碰撞的车辆，将这些车辆作为关键车辆，如下图所示：
 ![](https://cdn.nlark.com/yuque/0/2024/jpeg/27299753/1724137589460-e6308091-82cb-416f-ba82-3c749a27d0f5.jpeg?x-oss-process=image%2Fformat%2Cwebp#averageHue=%23ecede6&from=url&id=kOu8c&originHeight=494&originWidth=924&originalType=binary&ratio=1.100000023841858&rotation=0&showTitle=false&status=done&style=none&title=)
 自车的推演方式：横向：纯跟踪，纵向：IDM
+
 横向推演：基于自车的横向语义动作和目标参考路径的横向位置，不考虑周围agent下推演自车 planning Horizon下的转角变化
+
 纵向推演：基于自车的纵向语义动作和自车当前的速度，改变自车的desired velocity，不考虑 leading agent和rear agent下推演自车在planning Horizon下的纵向速度
+
 综合自车的横向推演和纵向推演可以得到自车开环planning Horizon下的轨迹
+
 他车的推演方式: 直接采用预测轨迹作为开环前推轨迹
 ```cpp
 final_key_agent = dict()
@@ -386,7 +392,8 @@ ForwardSimulation(std::vector<double> dt_steps, ForwardSimEgoState forward_sim_e
 
 场景树分叉的判断标准: 
 由于场景外推以0.2s外推一个状态，可以选择每5个节点，即1s进行一次场景树的合并判断, 找到分叉点,最晚分叉点设置为4s。
-伪代码
+
+伪代码：
 ```cpp
 planning_horizon = 8
 max_branch_time = 4
