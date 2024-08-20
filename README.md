@@ -544,12 +544,8 @@ optimal_traj = GetTraj(optimal_traj_tree) {
 
 #### 路测效果
 
-#### 路测效果
-
-#### 路测效果
-
 | 小gap变道 | [1.mp4 (15.02MB)](./case/1.mp4) [2.mp4 (12.81MB)](./case/2.mp4) [3.mp4 (15.4MB)](./case/3.mp4) |
-| --- | --- |
+| :-- | --- |
 | 旁边快速车辆，灵活切换gap | [4.mp4 (20.56MB)](./case/4.mp4) |
 | cut-in车辆，更新变道点 | [5.mp4 (16.97MB)](./case/5.mp4) |
 | 前方死车，旁边密集车流 | [6.mp4 (29.05MB)](./case/6.mp4) |
