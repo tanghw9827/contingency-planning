@@ -542,24 +542,18 @@ optimal_traj = GetTraj(optimal_traj_tree) {
 ```
 #### 路测效果
 
-<table>
-  <tr>
-    <td>小gap变道</td>
-    <td>
-      <video controls width="320">
-        <source src="https://www.yuque.com/docs/182393691?_lake_card=%7B%22status%22%3A%22done%22%2C%22name%22%3A%221.mp4%22%2C%22size%22%3A15751781%2C%22taskId%22%3A%22u8465bdf0-a3a6-4bd0-abc5-94d23ac15b5%22%2C%22taskType%22%3A%22upload%22%2C%22url%22%3Anull%2C%22cover%22%3Anull%2C%22videoId%22%3A%22inputs%2Fprod%2Fyuque%2F2024%2F27299753%2Fmp4%2F1724143209246-e4ad219b-4bba-4b85-9ec3-ea9bf6b5d4ce.mp4%22%2C%22download%22%3Afalse%2C%22__spacing%22%3A%22both%22%2C%22id%22%3A%22pV8RL%22%2C%22margin%22%3A%7B%22top%22%3Atrue%2C%22bottom%22%3Atrue%7D%2C%22card%22%3A%22video%22%7D#pV8RL" type="video/mp4">
-        您的浏览器不支持HTML5视频标签。
-      </video>
-      <video controls width="320">
-        <source src="https://www.yuque.com/docs/182393691?_lake_card=%7B%22status%22%3A%22done%22%2C%22name%22%3A%222.mp4%22%2C%22size%22%3A13436417%2C%22taskId%22%3A%22u1ddcc65e-5ba3-4198-a262-0a04d61f82b%22%2C%22taskType%22%3A%22upload%22%2C%22url%22%3Anull%2C%22cover%22%3Anull%2C%22videoId%22%3A%22inputs%2Fprod%2Fyuque%2F2024%2F27299753%2Fmp4%2F1724143209245-2515145a-7908-45cc-9c3c-8e4f9dc44f02.mp4%22%2C%22download%22%3Afalse%2C%22__spacing%22%3A%22both%22%2C%22id%22%3A%22AnbJe%22%2C%22margin%22%3A%7B%22top%22%3Atrue%2C%22bottom%22%3Atrue%7D%2C%22card%22%3A%22video%22%7D#AnbJe" type="video/mp4">
-        您的浏览器不支持HTML5视频标签。
-      </video>
-      <video controls width="320">
-        <source src="https://www.yuque.com/docs/182393691?_lake_card=%7B%22status%22%3A%22done%22%2C%22name%22%3A%223.mp4%22%2C%22size%22%3A16142959%2C%22taskId%22%3A%22u57b1e122-ff1d-4472-857d-b983347c978%22%2C%22taskType%22%3A%22upload%22%2C%22url%22%3Anull%2C%22cover%22%3Anull%2C%22videoId%22%3A%22inputs%2Fprod%2Fyuque%2F2024%2F27299753%2Fmp4%2F1724143209279-2dbd065c-77ad-4045-ad9d-891a2777712d.mp4%22%2C%22download%22%3Afalse%2C%22__spacing%22%3A%22both%22%2C%22id%22%3A%22VODfN%22%2C%22margin%22%3A%7B%22top%22%3Atrue%2C%22bottom%22%3Atrue%7D%2C%22card%22%3A%22video%22%7D#VODfN" type="video/mp4">
-        您的浏览器不支持HTML5视频标签。
-      </video>
-    </td>
-  </tr>
-</table>
+#### 路测效果
+
+#### 路测效果
+
+| 小gap变道 | [![1.mp4 (15.02MB)](./case/1.mp4)](./case/1.mp4)[![2.mp4 (12.81MB)](./case/2.mp4)](./case/2.mp4)[![3.mp4 (15.4MB)](./case/3.mp4)](./case/3.mp4) |
+| --- | --- |
+| 旁边快速车辆，灵活切换gap | [![4.mp4 (20.56MB)](./case/4.mp4)](./case/4.mp4) |
+| cut-in车辆，更新变道点 | [![5.mp4 (16.97MB)](./case/5.mp4)](./case/5.mp4) |
+| 前方死车，旁边密集车流 | [![6.mp4 (29.05MB)](./case/6.mp4)](./case/6.mp4) |
+| 绕行后变道，成功避开死车 | [![7.mp4 (23.03MB)](./case/7.mp4)](./case/7.mp4) |
+| 低速行驶多次变道，和前方车辆行为保持一致 | [![8.mp4 (84.47MB)](./case/8.mp4)](./case/8.mp4)[![9.mp4 (67.89MB)](./case/9.mp4)](./case/9.mp4) |
+| 路口前效率变道 | [![10.mp4 (15.39MB)](./case/10.mp4)](./case/10.mp4) |
+
 
 
